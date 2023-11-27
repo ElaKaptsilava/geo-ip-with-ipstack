@@ -16,6 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
+
+from geolocationAPI import api as geolocation_api
+from geolocationAPI import views as geo_views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/token/", geo_views.MyTokenObtainPairView.as_view(), name="token_obtain"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
 ]
+
+urlpatterns += geolocation_api.location_urlpatterns
