@@ -12,15 +12,15 @@ def get_location_from_ipstack(ip: str, key: str = API_ACCESS_KEY) -> dict:
     location_data = {
         "ip": get_from_ip_stack.get("ip"),
         "type": get_from_ip_stack.get("type"),
-        "continent_code": get_from_ip_stack.get("continent_code"),
+        "continent_code": get_from_ip_stack.get("continent_code", "N"),
         "continent_name": get_from_ip_stack.get("continent_name"),
         "country_code": get_from_ip_stack.get("country_code"),
         "country_name": get_from_ip_stack.get("country_name"),
-        "region_code": get_from_ip_stack.get("region_code"),
+        "region_code": get_from_ip_stack.get("region_code", "N"),
         "region_name": get_from_ip_stack.get("region_name"),
         "city": get_from_ip_stack.get("city"),
         "zip": get_from_ip_stack.get("zip"),
-        "latitude": get_from_ip_stack.get("latitude"),
-        "longitude": get_from_ip_stack.get("longitude"),
+        "latitude": get_from_ip_stack.get("latitude", 0),
+        "longitude": get_from_ip_stack.get("longitude", 0),
     }
     return location_data

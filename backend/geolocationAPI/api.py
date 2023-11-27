@@ -1,11 +1,10 @@
 from rest_framework.routers import DefaultRouter
-from .views import ViewSetIP, LocInfoViewSet
+from .views import LocationInfoViewSet
 
 
 router = DefaultRouter()
 
-router.register(r"locations", ViewSetIP, basename="locations")
-router.register(r"loc", LocInfoViewSet, basename="locations")
+router.register(r"locations", LocationInfoViewSet, basename="locations")
 
 
 location_urlpatterns = router.urls

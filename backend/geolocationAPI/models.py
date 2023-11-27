@@ -21,3 +21,6 @@ class LocationInfo(ModelsManager):
     zip = models.CharField(max_length=10)
     latitude = models.FloatField()
     longitude = models.FloatField()
+
+    class Meta:
+        ordering = ["region_code"]
