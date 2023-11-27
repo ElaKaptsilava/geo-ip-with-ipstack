@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import LocationInfo
-from .ipstack import get_location_from_ipstack
+from .ipstack import IpClient
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -43,5 +43,5 @@ class LocationInfoSerializers(serializers.ModelSerializer):
         enter_ip = validated_data.get("enter_ip")
         if LocationInfo.objects.filter(ip=enter_ip):
             raise serializers.ValidationError("IP address already exists in DB")
-        location_data = get_location_from_ipstack(ip=enter_ip)
+        location_data = IpClient.get_location_from_ipstack(ip=enter_ip)
         return LocationInfo.objects.create(**location_data)

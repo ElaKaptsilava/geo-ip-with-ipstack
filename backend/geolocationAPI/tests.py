@@ -2,9 +2,11 @@ import json
 
 from django.urls import reverse
 from rest_framework.test import APITestCase
-
 import responses
+
 from .ipstack import API_ACCESS_KEY, URL
+from .views import LocationInfo
+from .ipstack import IpClient
 
 
 class TestLocationInfo(APITestCase):
@@ -27,13 +29,49 @@ class TestLocationInfo(APITestCase):
         }
 
     @responses.activate
-    def test_create_from_ipstack(self, mock_location):
+    def test_should_return_mock_location_when_create_from_ipstack(self):
         responses.add(responses.GET, self.url, json=self.mock_location, status=200)
 
-        request = self.client.post(
+        response = self.client.post(
             reverse("locations-list"),
-            json.dumps({"ip": self.ip}),
+            json.dumps({"enter_ip": self.ip}),
             content_type="application/json",
         )
 
-        self.assertEqual(request.data, self.mock_location)
+        self.assertEqual(response.data, self.mock_location)
+
+    @responses.activate
+    def test_should_return_ip_exist_when_create_location(self):
+        responses.add(responses.GET, self.url, json=self.mock_location, status=200)
+        geolocation_1 = LocationInfo.objects.create(**self.mock_location)
+
+        json_response = self.client.post(
+            reverse("locations-list"),
+            json.dumps({"enter_ip": self.ip}),
+            content_type="application/json",
+        ).json()
+        output = json_response[0]
+
+        self.assertEqual(output, "IP address already exists in DB")
+
+    @responses.activate
+    def test_should_return_not_valid_ip_when_create_location(self):
+        responses.add(responses.GET, self.url, json=self.mock_location, status=200)
+        not_valid_ip = "123"
+
+        json_response = self.client.post(
+            reverse("locations-list"),
+            json.dumps({"enter_ip": not_valid_ip}),
+            content_type="application/json",
+        ).json()
+        output = json_response.get("enter_ip")[0]
+
+        self.assertEqual(output, "Enter a valid IPv4 or IPv6 address.")
+
+    @responses.activate
+    def test_should_return_location_data_when_get_location_from_ipstack(self):
+        responses.add(responses.GET, self.url, json=self.mock_location, status=200)
+
+        location_data = IpClient.get_location_from_ipstack(ip=self.ip)
+
+        self.assertEqual(location_data, self.mock_location)
