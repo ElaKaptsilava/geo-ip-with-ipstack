@@ -1,6 +1,7 @@
 import json
 
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
 import responses
 
@@ -39,6 +40,7 @@ class TestLocationInfo(APITestCase):
         )
 
         self.assertEqual(response.data, self.mock_location)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     @responses.activate
     def test_should_return_ip_exist_when_create_location(self):
@@ -49,10 +51,11 @@ class TestLocationInfo(APITestCase):
             reverse("locations-list"),
             json.dumps({"enter_ip": self.ip}),
             content_type="application/json",
-        ).json()
-        output = json_response[0]
+        )
+        output = json_response.json()[0]
 
         self.assertEqual(output, "IP address already exists in DB")
+        self.assertEqual(json_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @responses.activate
     def test_should_return_not_valid_ip_when_create_location(self):
@@ -63,10 +66,11 @@ class TestLocationInfo(APITestCase):
             reverse("locations-list"),
             json.dumps({"enter_ip": not_valid_ip}),
             content_type="application/json",
-        ).json()
-        output = json_response.get("enter_ip")[0]
+        )
+        output = json_response.json().get("enter_ip")[0]
 
         self.assertEqual(output, "Enter a valid IPv4 or IPv6 address.")
+        self.assertEqual(json_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @responses.activate
     def test_should_return_location_data_when_get_location_from_ipstack(self):
